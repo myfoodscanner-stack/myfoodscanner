@@ -30,6 +30,10 @@ class Database {
     }
   }
 
+  public reloadFromDisk() {
+    this.loadFromDisk();
+  }
+
   private loadFromDisk() {
     try {
       if (fs.existsSync(STORAGE_FILE)) {
@@ -60,7 +64,7 @@ class Database {
   }
 
   private async seedInitialData() {
-    const adminPasswordHash = bcrypt.hashSync('MyFoodScanner_2026', 10);
+    const adminPasswordHash = bcrypt.hashSync('Myfoodscanner_2026', 10);
     const demoPasswordHash = bcrypt.hashSync('Myfoodscanner_2026', 10);
 
     // 1. Admin Seed
