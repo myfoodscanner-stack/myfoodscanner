@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { ShieldCheck, Check, Sparkles, Crown, ArrowLeft } from 'lucide-react';
 import { PayPalButton } from '../components/PayPalButton';
-import { GuaranteeBanner } from '../components/GuaranteeBanner';
 import { useAuth } from '../context/AuthContext';
 
 interface PricingPageProps {
@@ -21,7 +20,6 @@ export const PricingPage: React.FC<PricingPageProps> = ({ onNavigate }) => {
     '3 Healthier alternative recommendations (rated 90+) for every item',
     'Comprehensive scan history & personal health analytics',
     'Weekly food safety hazard alerts by email',
-    '48-hour 100% money-back guarantee (1st payment only)'
   ];
 
   return (
@@ -49,9 +47,6 @@ export const PricingPage: React.FC<PricingPageProps> = ({ onNavigate }) => {
             Get instant access to all AI food label detection features on your smartphone.
           </p>
         </div>
-
-        {/* 48h Guarantee Banner */}
-        <GuaranteeBanner />
 
         {/* Plan Selector Toggle */}
         <div className="flex items-center justify-center">

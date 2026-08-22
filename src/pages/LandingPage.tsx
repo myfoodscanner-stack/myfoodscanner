@@ -15,7 +15,6 @@ import {
   Smartphone,
   Info
 } from 'lucide-react';
-import { GuaranteeBanner } from '../components/GuaranteeBanner';
 import { ScoreGauge } from '../components/ScoreGauge';
 import { BlurredModulePreview } from '../components/BlurredModulePreview';
 import { PWAInstallModal } from '../components/PWAInstallModal';
@@ -156,9 +155,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
         </div>
       </section>
 
-      {/* ================= 48-HOUR GUARANTEE BANNER ================= */}
-      <GuaranteeBanner />
-
       {/* ================= 8 FEATURE CARDS ================= */}
       <section className="py-16 px-4 max-w-6xl mx-auto w-full">
         <div className="text-center max-w-2xl mx-auto mb-12 space-y-2">
@@ -282,7 +278,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
 
           <p className="text-xs text-emerald-400/80 flex items-center justify-center gap-1.5 font-medium">
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            48-hour 100% money-back guarantee (1st payment only)
+            Full access to all 6 AI health modules • Cancel anytime
           </p>
         </div>
       </section>

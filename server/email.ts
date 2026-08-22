@@ -66,7 +66,6 @@ export async function sendWelcomeEmail(email: string, name: string) {
           <li>Immediate healthier 90+ rated alternatives</li>
         </ul>
         <p><a href="https://myfoodscanner.com/dashboard/scan" style="display:inline-block; background-color: #4caf50; color:#ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 12px;">Go to My Account</a></p>
-        <p style="font-size: 12px; color: #a0c0a0; margin-top: 24px;">48-hour unconditional money-back guarantee on your first subscription payment.</p>
       </div>
     `,
   });
@@ -90,9 +89,6 @@ export async function sendPaymentConfirmedEmail(email: string, name: string, pla
           <li>Detailed Additives & Endocrine Disruptors Breakdown</li>
           <li>Full Scan History with Export capability</li>
         </ul>
-        <div style="background-color: #224222; border-left: 4px solid #4caf50; padding: 12px; margin: 16px 0;">
-          <strong>48-Hour Money-Back Guarantee:</strong> If for any reason you are not completely satisfied, you can claim an instant full refund directly from your Settings page within 48 hours of payment.
-        </div>
         <p><a href="https://myfoodscanner.com/dashboard/scan" style="display:inline-block; background-color: #4caf50; color:#ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Start Scanning Food Labels</a></p>
       </div>
     `,
@@ -117,25 +113,7 @@ export async function sendCancellationConfirmedEmail(email: string, name: string
   });
 }
 
-// 4. Refund Confirmed Email
-export async function sendRefundConfirmedEmail(email: string, name: string, amount: number) {
-  return sendBrevoEmail({
-    toEmail: email,
-    toName: name,
-    subject: 'Your refund has been processed',
-    htmlContent: `
-      <div style="font-family: Arial, sans-serif; background-color: #1a3a1a; color: #ffffff; padding: 24px; border-radius: 8px;">
-        <h2 style="color: #4caf50;">48-Hour Guarantee Refund Processed 💳</h2>
-        <p>Hello ${name},</p>
-        <p>Your full refund of <strong>$${amount.toFixed(2)}</strong> has been processed back to your original payment method via PayPal.</p>
-        <p>Depending on your bank, the funds will appear in your account within 1-3 business days.</p>
-        <p>Thank you for trying My Food Scanner!</p>
-      </div>
-    `,
-  });
-}
-
-// 5. Weekly Food Safety Alert Email
+// 4. Weekly Food Safety Alert Email
 export async function sendWeeklyFoodSafetyTip(email: string, name: string) {
   return sendBrevoEmail({
     toEmail: email,

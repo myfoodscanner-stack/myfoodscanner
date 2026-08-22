@@ -1,5 +1,5 @@
 import React from 'react';
-import { Lock, Sparkles, ShieldAlert, ArrowRight } from 'lucide-react';
+import { Lock, Sparkles, ArrowRight } from 'lucide-react';
 
 interface BlurredModulePreviewProps {
   title: string;
@@ -42,13 +42,9 @@ export const BlurredModulePreview: React.FC<BlurredModulePreviewProps> = ({
             <ArrowRight className="w-4 h-4 ml-1" />
           </button>
         </div>
-
-        <p className="text-[11px] text-emerald-400/80 mt-3.5 flex items-center gap-1.5 font-medium">
-          <ShieldAlert className="w-3.5 h-3.5 text-emerald-400" />
-          48-hour money-back guarantee (1st payment only)
-        </p>
       </div>
     </div>
   );
 };
+
 

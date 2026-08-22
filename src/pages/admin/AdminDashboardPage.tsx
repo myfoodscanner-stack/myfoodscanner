@@ -206,7 +206,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ onNaviga
 
           <div className="bg-[#101c10] border border-[#203620] p-4 rounded-2xl flex items-center justify-between">
             <div>
-              <span className="text-xs text-emerald-300/70 block">48h Refunds Issued</span>
+              <span className="text-xs text-emerald-300/70 block">Refunded Accounts</span>
               <span className="text-xl font-bold text-red-400">{stats?.refunded_count || 0}</span>
             </div>
             <AlertTriangle className="w-5 h-5 text-red-400/60" />

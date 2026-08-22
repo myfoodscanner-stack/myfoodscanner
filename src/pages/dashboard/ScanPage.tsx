@@ -17,7 +17,6 @@ import { useAuth } from '../../context/AuthContext';
 import { FoodScanResult } from '../../types';
 import { ScanResultCard } from '../../components/ScanResultCard';
 import { BlurredModulePreview } from '../../components/BlurredModulePreview';
-import { GuaranteeBanner } from '../../components/GuaranteeBanner';
 
 interface ScanPageProps {
   onNavigate: (page: string) => void;
@@ -224,8 +223,6 @@ export const ScanPage: React.FC<ScanPageProps> = ({ onNavigate }) => {
               Detect controversial additives, hormonal disruptors, and ultra-processed ingredients.
             </p>
           </div>
-
-          <GuaranteeBanner compact />
 
           <BlurredModulePreview
             title="AI Scanner Module Locked"

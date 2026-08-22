@@ -1,5 +1,5 @@
 import { db } from './db';
-import { sendPaymentConfirmedEmail, sendCancellationConfirmedEmail, sendRefundConfirmedEmail } from './email';
+import { sendPaymentConfirmedEmail, sendCancellationConfirmedEmail } from './email';
 
 export const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID || '';
 export const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET || '';
@@ -186,51 +186,6 @@ export async function verifyAndCapturePayPalOrder(userId: string, plan: 'monthly
   await sendPaymentConfirmedEmail(user.email, user.name, plan, amount);
 
   return updatedUser;
-}
-
-export async function processRefund48h(userId: string) {
-  const user = await db.getUserById(userId);
-  if (!user) throw new Error('User not found');
-
-  if (user.subscription_status === 'refunded') {
-    throw new Error('A refund has already been issued for this account.');
-  }
-
-  if (!user.first_payment_date) {
-    throw new Error('No qualifying payment found.');
-  }
-
-  const paymentTime = new Date(user.first_payment_date).getTime();
-  const diffHours = (Date.now() - paymentTime) / (1000 * 60 * 60);
-
-  if (diffHours > 48) {
-    throw new Error('The 48-hour guarantee window has expired. Subsequent renewal periods are non-refundable.');
-  }
-
-  const refundAmount = user.subscription_plan === 'annual' ? 29.99 : 4.99;
-
-  // Revoke Pro access immediately & mark refunded
-  await db.updateUser(userId, {
-    tier: 'free',
-    subscription_status: 'refunded',
-  });
-
-  // Record refund transaction
-  await db.recordTransaction({
-    id: `ref_${Date.now()}`,
-    user_id: user.id,
-    user_email: user.email,
-    amount: refundAmount,
-    currency: 'USD',
-    plan: user.subscription_plan || 'monthly',
-    status: 'refunded',
-    date: new Date().toISOString(),
-  });
-
-  // Send Brevo Refund Confirmation Email
-  await sendRefundConfirmedEmail(user.email, user.name, refundAmount);
-
-  return { success: true, refundAmount };
 }
 
 export async function cancelAutoRenewal(userId: string) {

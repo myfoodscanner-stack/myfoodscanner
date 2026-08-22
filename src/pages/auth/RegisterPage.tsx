@@ -17,7 +17,6 @@ import {
   HelpCircle
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { GuaranteeBanner } from '../../components/GuaranteeBanner';
 import { UserDietProfile } from '../../types';
 
 interface RegisterPageProps {
@@ -196,8 +195,6 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
                 Start scanning food labels and protect your family's health.
               </p>
             </div>
-
-            <GuaranteeBanner compact />
 
             <div className="bg-[#142314] border border-[#274227] rounded-3xl p-6 sm:p-8 shadow-2xl shadow-emerald-950 space-y-5">
               {error && (

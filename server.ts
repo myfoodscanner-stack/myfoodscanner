@@ -9,7 +9,6 @@ import { analyzeFoodLabel } from './server/ai';
 import { 
   createPayPalOrder, 
   verifyAndCapturePayPalOrder, 
-  processRefund48h, 
   cancelAutoRenewal, 
   handlePayPalWebhook,
   PAYPAL_CLIENT_ID,
@@ -375,7 +374,7 @@ async function startServer() {
   });
 
   // ==========================================
-  // SUBSCRIPTION & 48H GUARANTEE ROUTES
+  // SUBSCRIPTION ROUTES
   // ==========================================
   app.get('/api/subscription/status', authenticate, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
@@ -385,17 +384,6 @@ async function startServer() {
         return;
       }
 
-      let guaranteeRemainingMs = 0;
-      let isGuaranteeEligible = false;
-
-      if (user.first_payment_date && user.subscription_status === 'active') {
-        const paymentTime = new Date(user.first_payment_date).getTime();
-        const elapsedMs = Date.now() - paymentTime;
-        const total48hMs = 48 * 60 * 60 * 1000;
-        guaranteeRemainingMs = Math.max(0, total48hMs - elapsedMs);
-        isGuaranteeEligible = guaranteeRemainingMs > 0;
-      }
-
       res.json({
         status: user.subscription_status,
         tier: user.tier,
@@ -403,8 +391,6 @@ async function startServer() {
         subscription_start: user.subscription_start,
         renews_at: user.subscription_renews_at,
         first_payment_date: user.first_payment_date,
-        guarantee_eligible: isGuaranteeEligible,
-        guarantee_remaining_ms: guaranteeRemainingMs,
       });
     } catch (err: any) {
       res.status(500).json({ error: 'Error fetching subscription status.' });
@@ -473,16 +459,6 @@ async function startServer() {
       res.json({ success: true, message: 'Automatic renewal successfully turned off.', user: updatedUser });
     } catch (err: any) {
       res.status(400).json({ error: err.message || 'Error cancelling auto-renewal.' });
-    }
-  });
-
-  // Claim 48-Hour Money-Back Guarantee Refund
-  app.post('/api/subscription/refund-48h', authenticate, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
-    try {
-      const result = await processRefund48h(req.user!.id);
-      res.json({ success: true, message: `Refund of $${result.refundAmount.toFixed(2)} processed successfully.` });
-    } catch (err: any) {
-      res.status(400).json({ error: err.message || 'Unable to issue refund.' });
     }
   });
 
