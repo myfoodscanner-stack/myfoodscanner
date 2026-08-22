@@ -1,10 +1,12 @@
+import dotenv from 'dotenv';
+dotenv.config({ override: true });
 import { db } from './db';
 import { sendPaymentConfirmedEmail, sendCancellationConfirmedEmail } from './email';
 
-export const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID || '';
-export const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET || '';
-export const PAYPAL_WEBHOOK_ID = process.env.PAYPAL_WEBHOOK_ID || '';
-export const PAYPAL_ENVIRONMENT = process.env.PAYPAL_ENVIRONMENT || 'sandbox';
+export const PAYPAL_CLIENT_ID = (process.env.PAYPAL_CLIENT_ID || '').trim();
+export const PAYPAL_CLIENT_SECRET = (process.env.PAYPAL_CLIENT_SECRET || '').trim();
+export const PAYPAL_WEBHOOK_ID = (process.env.PAYPAL_WEBHOOK_ID || '').trim();
+export const PAYPAL_ENVIRONMENT = (process.env.PAYPAL_ENVIRONMENT || 'sandbox').trim().toLowerCase();
 const PAYPAL_API_BASE = PAYPAL_ENVIRONMENT === 'live' ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com';
 
 export function isPayPalConfigured(): boolean {
@@ -38,7 +40,7 @@ export async function getPayPalAccessToken(): Promise<string | null> {
       return null;
     }
     const data: any = await response.json();
-    return data.access_token;
+    return data.access_token || null;
   } catch (err) {
     console.warn('PayPal OAuth token network error:', err);
     return null;
@@ -50,14 +52,12 @@ export async function getPayPalAccessToken(): Promise<string | null> {
  */
 export async function createPayPalOrder(plan: 'monthly' | 'annual'): Promise<{ orderId: string }> {
   const token = await getPayPalAccessToken();
+  if (!token) {
+    throw new Error('PAYPAL_AUTHENTICATION_FAILED: PayPal authentication failed. Please verify PayPal Sandbox API credentials.');
+  }
+
   const amount = plan === 'annual' ? '29.99' : '4.99';
   const description = plan === 'annual' ? 'MyFoodScanner Pro Annual Membership ($29.99/yr)' : 'MyFoodScanner Pro Monthly Membership ($4.99/mo)';
-
-  // If live/custom credentials are not configured yet, generate a safe Sandbox Preview Order
-  if (!token) {
-    const sandboxOrderId = `SANDBOX-${plan.toUpperCase()}-${Date.now()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
-    return { orderId: sandboxOrderId };
-  }
 
   const response = await fetch(`${PAYPAL_API_BASE}/v2/checkout/orders`, {
     method: 'POST',
@@ -94,6 +94,9 @@ export async function createPayPalOrder(plan: 'monthly' | 'annual'): Promise<{ o
   }
 
   const orderData: any = await response.json();
+  if (!orderData?.id) {
+    throw new Error('PayPal API did not return a valid order ID.');
+  }
   return { orderId: orderData.id };
 }
 
@@ -101,7 +104,7 @@ export async function createPayPalOrder(plan: 'monthly' | 'annual'): Promise<{ o
  * Verifies and captures a real PayPal Order before granting Pro access
  */
 export async function verifyAndCapturePayPalOrder(userId: string, plan: 'monthly' | 'annual', orderId: string) {
-  if (!orderId || typeof orderId !== 'string') {
+  if (!orderId || typeof orderId !== 'string' || orderId.startsWith('SANDBOX-') || orderId.startsWith('ORDER_TEST_') || orderId.startsWith('ORDER_LIVE_TEST_')) {
     throw new Error('Valid PayPal Order ID is strictly required.');
   }
 
@@ -109,49 +112,45 @@ export async function verifyAndCapturePayPalOrder(userId: string, plan: 'monthly
   if (!user) throw new Error('User not found');
 
   const token = await getPayPalAccessToken();
+  if (!token) {
+    throw new Error('PAYPAL_AUTHENTICATION_FAILED: PayPal authentication token could not be obtained.');
+  }
 
-  // If PayPal API is configured with real credentials, perform strict remote verification
-  if (token) {
-    let captureResponse = await fetch(`${PAYPAL_API_BASE}/v2/checkout/orders/${orderId}/capture`, {
-      method: 'POST',
+  // Perform strict remote verification on PayPal API
+  let captureResponse = await fetch(`${PAYPAL_API_BASE}/v2/checkout/orders/${orderId}/capture`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+
+  let captureData: any = null;
+
+  if (captureResponse.ok) {
+    captureData = await captureResponse.json();
+  } else {
+    const orderCheck = await fetch(`${PAYPAL_API_BASE}/v2/checkout/orders/${orderId}`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
     });
 
-    let captureData: any = null;
-
-    if (captureResponse.ok) {
-      captureData = await captureResponse.json();
+    if (orderCheck.ok) {
+      captureData = await orderCheck.json();
     } else {
-      const orderCheck = await fetch(`${PAYPAL_API_BASE}/v2/checkout/orders/${orderId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (orderCheck.ok) {
-        captureData = await orderCheck.json();
-      } else {
-        const errText = await captureResponse.text();
-        console.error('PayPal capture error:', captureResponse.status, errText);
-        throw new Error('PayPal payment could not be captured or verified. No charge was confirmed.');
-      }
+      const errText = await captureResponse.text();
+      console.error('PayPal capture error:', captureResponse.status, errText);
+      throw new Error('PayPal payment could not be captured or verified. No charge was confirmed.');
     }
+  }
 
-    const isCompleted = captureData.status === 'COMPLETED' || 
-      (captureData.purchase_units?.[0]?.payments?.captures?.[0]?.status === 'COMPLETED');
+  const isCompleted = captureData.status === 'COMPLETED' || 
+    (captureData.purchase_units?.[0]?.payments?.captures?.[0]?.status === 'COMPLETED');
 
-    if (!isCompleted) {
-      throw new Error(`Payment verification unconfirmed. PayPal status: ${captureData.status || 'UNKNOWN'}. Account has NOT been charged or upgraded.`);
-    }
-  } else {
-    // In Sandbox preview mode without configured credentials
-    if (!orderId.startsWith('SANDBOX-') && !orderId.startsWith('PP-') && !orderId.startsWith('PAYPAL-')) {
-      throw new Error('Invalid sandbox transaction identifier.');
-    }
+  if (!isCompleted) {
+    throw new Error(`Payment verification unconfirmed. PayPal status: ${captureData.status || 'UNKNOWN'}. Account has NOT been charged or upgraded.`);
   }
 
   const now = new Date();

@@ -1,4 +1,7 @@
+import 'dotenv/config';
 import express, { Request, Response } from 'express';
+import dotenv from 'dotenv';
+dotenv.config({ override: true });
 import path from 'path';
 import bcrypt from 'bcryptjs';
 import cors from 'cors';
@@ -415,7 +418,11 @@ async function startServer() {
       res.json(order);
     } catch (err: any) {
       console.error('Create PayPal order error:', err);
-      res.status(500).json({ error: err.message || 'Unable to initialize PayPal order.' });
+      const isAuthError = err.message?.includes('PAYPAL_AUTHENTICATION_FAILED');
+      res.status(500).json({ 
+        error: isAuthError ? 'PAYPAL_AUTHENTICATION_FAILED' : (err.message || 'Unable to initialize PayPal order.'),
+        message: isAuthError ? 'PayPal Sandbox authentication failed.' : (err.message || 'Unable to initialize PayPal order.')
+      });
     }
   });
 

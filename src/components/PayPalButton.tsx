@@ -109,11 +109,17 @@ export const PayPalButton: React.FC<PayPalButtonProps> = ({ plan, onSuccess }) =
                   });
                   const data = await res.json();
                   if (!res.ok) {
-                    throw new Error(data.error || 'Failed to initialize PayPal order.');
+                    if (data.error === 'PAYPAL_AUTHENTICATION_FAILED' || data.message?.includes('authentication failed')) {
+                      throw new Error('PayPal payment could not be initialized. Please try again later.');
+                    }
+                    throw new Error(data.message || data.error || 'PayPal payment could not be initialized. Please try again later.');
+                  }
+                  if (!data.orderId || data.orderId.startsWith('SANDBOX-')) {
+                    throw new Error('PayPal payment could not be initialized. Please try again later.');
                   }
                   return data.orderId;
                 } catch (err: any) {
-                  setError(err.message || 'Unable to connect to PayPal.');
+                  setError(err.message || 'PayPal payment could not be initialized. Please try again later.');
                   throw err;
                 }
               }}
