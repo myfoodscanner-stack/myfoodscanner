@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: #111a11;
+    color: #eafbea;
+  }
+
+  h1, h2, h3, h4, .font-display {
+    font-family: 'Sora', system-ui, -apple-system, sans-serif;
+  }
+}
+
+/* Custom subtle scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #111a11;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #243b24;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #365e36;
+}
+
+/* Glass & Glow utilities for food radar aesthetic */
+.card-scanner {
+  background: #1a291a;
+  border: 1px solid #284428;
+  border-radius: 16px;
+}
+
+.radar-glow {
+  box-shadow: 0 0 25px -5px rgba(76, 175, 80, 0.3);
+}
+
+.danger-glow {
+  box-shadow: 0 0 25px -5px rgba(229, 57, 53, 0.3);
+}

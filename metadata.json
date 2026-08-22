@@ -1,0 +1,6 @@
+{
+  "name": "My Food Scanner",
+  "description": "Scan any food label instantly. AI-powered multi-dimensional analysis of additives, endocrine disruptors, allergens, NOVA processing score, and glycemic impact.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

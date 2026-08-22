@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 320" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#08140a" />
+      <stop offset="100%" stop-color="#0e2311" />
+    </linearGradient>
+
+    <!-- Neon Green Glow Filter -->
+    <filter id="greenGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <!-- Radar Line Gradient -->
+    <linearGradient id="radarLineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#16a34a" stop-opacity="0.2" />
+      <stop offset="25%" stop-color="#22c55e" stop-opacity="0.8" />
+      <stop offset="50%" stop-color="#4ade80" stop-opacity="1" />
+      <stop offset="75%" stop-color="#22c55e" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#16a34a" stop-opacity="0.2" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background Rounded Rect -->
+  <rect width="256" height="320" rx="48" fill="url(#bgGrad)" />
+
+  <!-- Fork (Left side) -->
+  <g fill="#ffffff">
+    <!-- Fork 4 Tines -->
+    <rect x="46" y="16" width="10" height="74" rx="5" />
+    <rect x="66" y="16" width="10" height="74" rx="5" />
+    <rect x="86" y="16" width="10" height="74" rx="5" />
+    <rect x="106" y="16" width="10" height="74" rx="5" />
+
+    <!-- Fork Base / Cup -->
+    <path d="M 46 64 C 46 112, 116 112, 116 64 Z" />
+
+    <!-- Fork Neck & Handle -->
+    <path d="M 72 100 L 90 100 C 88 120, 90 160, 90 280 C 90 294, 72 294, 72 280 Z" />
+  </g>
+
+  <!-- Magnifying Glass (Center-Right) -->
+  <g>
+    <!-- Handle (extending diagonally to the bottom-right) -->
+    <path d="M 172 208 L 222 258" stroke="#ffffff" stroke-width="15" stroke-linecap="round" />
+
+    <!-- Lens Outer Ring -->
+    <circle cx="138" cy="168" r="54" fill="#0c1e0e" stroke="#ffffff" stroke-width="12" />
+
+    <!-- Scanner Reticle Corner Brackets -->
+    <g stroke="#22c55e" stroke-width="4" stroke-linecap="square" fill="none">
+      <!-- Top-Left -->
+      <path d="M 104 148 L 104 136 L 116 136" />
+      <!-- Top-Right -->
+      <path d="M 160 136 L 172 136 L 172 148" />
+      <!-- Bottom-Left -->
+      <path d="M 104 188 L 104 200 L 116 200" />
+      <!-- Bottom-Right -->
+      <path d="M 160 200 L 172 200 L 172 188" />
+    </g>
+
+    <!-- Glowing Horizontal Scanline with Waveform -->
+    <g filter="url(#greenGlow)">
+      <!-- Baseline beam -->
+      <line x1="88" y1="168" x2="188" y2="168" stroke="url(#radarLineGrad)" stroke-width="3.5" />
+
+      <!-- Frequency / Barcode / Bio-Scan Waveform -->
+      <path d="M 118 168 L 118 160 M 118 168 L 118 176
+               M 126 168 L 126 154 M 126 168 L 126 182
+               M 134 168 L 134 146 M 134 168 L 134 190
+               M 142 168 L 142 152 M 142 168 L 142 184
+               M 150 168 L 150 160 M 150 168 L 150 176
+               M 158 168 L 158 164 M 158 168 L 158 172"
+            stroke="#4ade80" stroke-width="3.5" stroke-linecap="round" />
+    </g>
+  </g>
+</svg>
